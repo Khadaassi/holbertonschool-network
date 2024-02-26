@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # List all TCP and UDP ports
 
 netstat - p
