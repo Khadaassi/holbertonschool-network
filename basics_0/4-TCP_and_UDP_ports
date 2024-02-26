@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+# Display Active Internet connections (only servers)
+echo "Active Internet connections (only servers)"
+echo "Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name"
+netstat -tuln | awk '$6 == "LISTEN" {print $1,$2,$3,$4,$5,$6,$7}' | while read proto recvq sendq local foreign state; do
+    pid=$(lsof -ti :${local##*:})
+    program=$(ps -p $pid -o comm=)
+    echo "$proto $recvq $sendq $local $foreign $state $pid/$program"
+done
+
+# Display Active UNIX domain sockets (only servers)
+echo "Active UNIX domain sockets (only servers)"
+echo "Proto RefCnt Flags       Type       State         I-Node   PID/Program name    Path"
+netstat -x | awk '$1 == "unix" && $5 == "LISTEN" {print $1,$2,$3,$4,$5,$6,$7,$8,$9}' | while read proto refcnt flags type state inode path; do
+    pid=$(lsof -t $path)
+    program=$(ps -p $pid -o comm=)
+    echo "$proto $refcnt $flags $type $state $inode $pid/$program $path"
+done
